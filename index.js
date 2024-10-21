@@ -9,7 +9,16 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 })
 
-// starting of the server and on which port the server has to work.
-app.listen(300, () => {
-    console.log('Server is running on port 300.')
+app.get('/api/artists', (req, res) => {
+    res.send([
+        "JB",
+        "Beyonce",
+    ]);
 })
+
+// starting of the server and on which port the server has to work.
+app.listen(3000, () => {
+    console.log('Server is running on port 3000.')
+})
+
+
