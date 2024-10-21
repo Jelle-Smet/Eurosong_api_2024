@@ -3,6 +3,11 @@ require('dotenv').config();
 
 class Database {
     async connect() {
+        console.log(process.env.db_host);
+        console.log(process.env.db_user);
+        console.log(process.env.db_pass);
+        console.log(process.env.db_name);
+        console.log(process.env.db_port);
         const connection = await mysql.createConnection({
             host: process.env.db_host,
             user: process.env.db_user,

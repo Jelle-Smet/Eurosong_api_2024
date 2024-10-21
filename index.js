@@ -35,6 +35,24 @@ app.get('/api/songs', (req, res) => {
     });
 });
 
+// voting
+app.get('/api/ranking', (req, res) => {
+    const db = new Database();
+    db.getQuery(`
+        SELECT v.song_id AS Song_Id, s.name AS Song_Name, a.name AS Artist_Name, SUM(points) AS Total_Points
+        FROM 
+            votes AS v
+	            INNER JOIN songs AS s
+		            ON v.song_id = s.song_id
+	            INNER JOIN artists AS a
+                    ON s.artist_id = a.artist_id
+        GROUP BY v.song_id
+        ORDER BY SUM(points) DESC;
+    `).then((ranking) => {
+        res.send(ranking);
+    });
+});
+
 // Starten van de server en op welke port de server moet luistere
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
