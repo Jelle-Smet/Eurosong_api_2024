@@ -1,7 +1,7 @@
 // Importeren van de express module in node_modules
 const express = require('express');
-const cors = require ('cors'); 
-const bodyparser = require('body-parser');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const Database = require('./classes/database.js');
 
 // Aanmaken van een express app
@@ -14,23 +14,21 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 }));
 
-// middleware om JSON-request te parsen
-app.use(bodyparser.json());
+// Middleware om JSON-requests te parsen
+app.use(bodyParser.json());
 
 // Endpoints
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-// artists
 app.get('/api/artists', (req, res) => {
     const db = new Database();
-    db.getQuery('SELECT * FROM artists').then((artist) => {
-        res.send(artist);
+    db.getQuery('SELECT * FROM artists').then((artists) => {
+        res.send(artists);
     });
 });
 
-//votes
 app.get('/api/votes', (req, res) => {
     const db = new Database();
     db.getQuery('SELECT * FROM votes').then((votes) => {
@@ -38,12 +36,11 @@ app.get('/api/votes', (req, res) => {
     });
 });
 
-// songs
 app.get('/api/songs', (req, res) => {
     const db = new Database();
     db.getQuery(`
         SELECT
-            song_id, s.name AS songname, a.name AS artistname
+            song_id, s.name AS song_name, a.name AS artist_name
         FROM
             songs AS s
                 INNER JOIN
@@ -55,18 +52,19 @@ app.get('/api/songs', (req, res) => {
     });
 });
 
-// voting
 app.get('/api/ranking', (req, res) => {
     const db = new Database();
     db.getQuery(`
-        SELECT v.song_id AS Song_Id, s.name AS Song_Name, a.name AS Artist_Name, SUM(points) AS Total_Points
-        FROM 
-            votes AS v
-	            INNER JOIN songs AS s
-		            ON v.song_id = s.song_id
-	            INNER JOIN artists AS a
-                    ON s.artist_id = a.artist_id
-        GROUP BY v.song_id
+        SELECT songs.song_id, songs.name AS song_name, artists.name AS artist_name, SUM(points) AS total_points
+        FROM
+            votes
+                INNER JOIN
+                    songs
+                        ON songs.song_id = votes.song_id
+                INNER JOIN
+                    artists
+                        ON songs.artist_id = artists.artist_id
+        GROUP BY song_id
         ORDER BY SUM(points) DESC;
     `).then((ranking) => {
         res.send(ranking);
